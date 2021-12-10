@@ -1,6 +1,7 @@
 <template>
   <div class="formDiv">
     <form @submit.prevent="submitForm">
+      <h1>Calculating Form</h1>
       <div class="form-group">
         <p>
           {{ form.descriptionMaxLength - form.description.length }} /
@@ -23,18 +24,26 @@
         <p v-if="radiusButton" class="errors">Text is required</p>
       </div>
 
-      <select @change="changeDisable" v-model="vatInput">
-        <option disabled hidden>Choose vat</option>
-        <option :value="19">19%</option>
-        <option :value="21">21%</option>
-        <option :value="23">23%</option>
-        <option :value="25">25%</option>
-      </select>
-      <label for="price Netto EUR">price Netto EUR</label>
-      <input type="text" :disabled="isDisabled" />
-      <label for="price Brutto EUR">price Brutto EUR</label>
-      <input type="text" :value="vatInput" :disabled="isDisabled" />
+      <div class="form-group">
+        <select @change="changeDisable" :value="form.vatInput" v-model="form.vatInput">
+          <option :value="form.vatInput" disabled hidden>Choose vat</option>
+          <option v-for="option in options" :key="option.value" :value="option.value">
+            {{ option.value + "%" }}
+          </option>
+        </select>
+        <label for="price Netto EUR" >price Netto EUR</label>
+        <input
+          type="number"
+          v-model="form.nettoPriceInput"
+          :disabled="isDisabled"
+        />
+        <p class="errors" v-if="!nettoInput"></p>
+        <label for="price Brutto EUR">price Brutto EUR</label>
+        <input type="number" :value="vatInput" disabled />
+      </div>
       <button type="submit">Submit</button>
+      {{ calculateBrutto }}
+      {{form.vatInput}}
     </form>
   </div>
 </template>
@@ -44,10 +53,24 @@ export default {
   name: "App",
   data() {
     return {
+      options: [
+        {
+          value: 19,
+        },
+        {
+          value: 21,
+        },
+        {
+          value: 23,
+        },
+        {
+          value: 25,
+        },
+      ],
       disabled: false,
       form: {
         description: "",
-        vatInput: "",
+        vatInput: 0,
         sendInformation: null,
         radiusButton: null,
         bruttoPriceInput: null,
@@ -63,6 +86,7 @@ export default {
         this.descriptionValidation &&
         this.descriptionLengthValidation &&
         radioButtonValidation &&
+        this.nettoInput &&
         this.disableBrutto;
       if (formValidation) {
         return "good";
@@ -71,12 +95,17 @@ export default {
       }
     },
     changeDisable() {
-      this.disabled = true
+      this.disabled = true;
     },
   },
   computed: {
     isDisabled() {
-     return this.disabled === false
+      return this.disabled === false;
+    },
+    calculateBrutto() {
+      
+      let calculateVat = (this.form.nettoPriceInput / 100) * this.form.vatInput
+      return this.form.nettoPriceInput - calculateVat;
     },
 
     descriptionValidation() {
