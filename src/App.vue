@@ -23,18 +23,18 @@
         <p v-if="radiusButton" class="errors">Text is required</p>
       </div>
 
-      <select placeholder="Choose Vat" v-model="vatInput">
-        <option :value="dsadsa" disabled hidden>Choose vat</option>
-        <option>19%</option>
-        <option>21%</option>
-        <option>23%</option>
-        <option>25%</option>
+      <select @change="changeDisable" v-model="vatInput">
+        <option disabled hidden>Choose vat</option>
+        <option :value="19">19%</option>
+        <option :value="21">21%</option>
+        <option :value="23">23%</option>
+        <option :value="25">25%</option>
       </select>
-      <label for="price Netto EUR" >price Netto EUR</label>
-      <input type="text" disabled />
+      <label for="price Netto EUR">price Netto EUR</label>
+      <input type="text" :disabled="isDisabled" />
       <label for="price Brutto EUR">price Brutto EUR</label>
-      <input type="text"  :disabled="isDisabled"/>
-      <button  type="submit">Submit</button>
+      <input type="text" :value="vatInput" :disabled="isDisabled" />
+      <button type="submit">Submit</button>
     </form>
   </div>
 </template>
@@ -44,11 +44,10 @@ export default {
   name: "App",
   data() {
     return {
-          disabled: false,
+      disabled: false,
       form: {
-    
         description: "",
-        vatInput: 'Choose Vat',
+        vatInput: "",
         sendInformation: null,
         radiusButton: null,
         bruttoPriceInput: null,
@@ -59,20 +58,27 @@ export default {
   },
   methods: {
     submitForm() {
-      const radioButtonValidation = !!this.radiusButton
+      const radioButtonValidation = !!this.radiusButton;
       const formValidation =
-        this.descriptionValidation && this.descriptionLengthValidation && radioButtonValidation && this.disableBrutto
+        this.descriptionValidation &&
+        this.descriptionLengthValidation &&
+        radioButtonValidation &&
+        this.disableBrutto;
       if (formValidation) {
         return "good";
       } else {
         return "wrong";
       }
     },
+    changeDisable() {
+      this.disabled = true
+    },
   },
   computed: {
     isDisabled() {
      return this.disabled === false
     },
+
     descriptionValidation() {
       return !!this.form.description;
     },
