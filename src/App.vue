@@ -11,9 +11,9 @@
           </p>
         </div>
 
-        <textarea v-model="form.description" maxlength="255"> </textarea>
+        <textarea v-model="form.description" maxlength="255"  > </textarea>
 
-        <p class="errors" v-if="!descriptionValidation">Text is required</p>
+        <p class="errors " v-if="!descriptionValidation">Text is required</p>
         <p class="errors" v-if="!descriptionLengthValidation">
           You can’t enter more than 255 characters
         </p>
@@ -51,12 +51,12 @@
       <div class="form-group">
         <label for="Send confirmation">Send Confirmation</label>
         <div class="displayFlex">
-          <label for="yes">Yes</label>
-          <input type="radio" :value="yes"  v-model="form.sendInformation" />
+          <label for="yes" >Yes</label>
+          <input type="radio" name="yesOrNo" v-model="form.radioButton" />
         </div>
         <div class="displayFlex">
-          <label for="no" >No</label>
-          <input type="radio" :value="no"  v-model="form.radioButton" />
+          <label for="no"  >No</label>
+          <input type="radio" name="yesOrNo" v-model="form.radioButton" />
         </div>
         <p v-if="!validateRadioButton" class="errors">Text is required</p>
       </div>
@@ -88,7 +88,6 @@ export default {
       form: {
         description: "",
         vatInput: 0,
-        sendInformation: null,
         radioButton: null,
         bruttoPriceInput: null,
         nettoPriceInput: null,
@@ -129,7 +128,7 @@ export default {
       );
     },
     validateRadioButton() {
-      return !!this.radioButton
+      return !!this.form.radioButton
     },
     chooseVatValidation() {
       return !!this.form.vatInput
@@ -220,5 +219,9 @@ p {
   display: flex;
   text-align: center;
   justify-content: center;
+}
+input:focus {
+	outline: 0;
+	border-color: #777;
 }
 </style>
