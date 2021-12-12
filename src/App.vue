@@ -1,6 +1,6 @@
 <template>
   <div class="formDiv">
-    <form @submit.prevent="submitForm">
+    <form @submit.prevent="veeSubmitForm">
       <h1>Calculating Form</h1>
       <div class="form-group">
         <div class="radioButton">
@@ -18,7 +18,9 @@
             maxlength="255"
           >
           </textarea>
-          <div class="errors" v-if="v$.form.description.$error">Text is required</div>
+          <div class="errors" v-if="v$.form.description.$error">
+            Text is required
+          </div>
         </label>
         <p class="errors" v-if="!descriptionLengthValidation">
           You can’t enter more than 255 characters
@@ -31,26 +33,32 @@
           @change="changeDisable"
           :value="form.vatInput"
           v-model="form.vatInput"
-              @blur="v$.form.vatInput.$touch"
+          @blur="v$.form.vatInput.$touch"
+           name="myselect"
         >
-          <option :value="form.vatInput" disabled hidden>Choose vat</option>
+          <option  value  disabled>Choose vat</option>
           <option
             v-for="option in options"
             :key="option.value"
             :value="option.value"
+          
           >
             {{ option.value + "%" }}
           </option>
         </select>
-              <div class="errors" v-if="v$.form.vatInput.$error">Text is required</div>
-        <p class="errors" v-if="!chooseVatValidation">Text is required</p>
+        <div class="errors" v-if="v$.form.vatInput.$error">
+          Text is required
+        </div>
         <label for="price Netto EUR">Price Netto EUR</label>
         <input
           type="number"
           v-model="form.nettoPriceInput"
           :disabled="isDisabled"
+          @blur="v$.form.vatInput.$touch"
         />
-        <p class="errors" v-if="!form.nettoPriceInput">Text is required</p>
+        <div class="errors" v-if="v$.form.nettoPriceInput.$error">
+          Text is required
+        </div>
 
         <label for="price Brutto EUR">Price Brutto EUR</label>
         <input type="number" :value="calculateBrutto" disabled />
@@ -58,16 +66,32 @@
       <div class="form-group">
         <label for="Send confirmation">Send Confirmation</label>
         <div class="displayFlex">
-          <label for="yes">Yes</label>
-          <input type="radio" name="yesOrNo" v-model="form.radioButton" />
+          <label for="yes"
+            >Yes
+            <input
+              type="radio"
+              name="yesOrNo"
+              v-model="form.radioButton"
+              @blur="v$.form.vatInput.$touch"
+            />
+          </label>
         </div>
         <div class="displayFlex">
-          <label for="no">No</label>
-          <input type="radio" name="yesOrNo" v-model="form.radioButton" />
+          <label for="no"
+            >No
+            <input
+              type="radio"
+              name="yesOrNo"
+              v-model="form.radioButton"
+              @blur="v$.form.vatInput.$touch"
+            />
+          </label>
         </div>
-        <p v-if="!validateRadioButton" class="errors">Text is required</p>
+        <div class="errors" v-if="v$.form.radioButton.$error">
+          Text is required
+        </div>
       </div>
-      <button type="submit" :disabled="!validateForm">Submit</button>
+      <button type="submit">Submit</button>
     </form>
   </div>
 </template>
@@ -102,7 +126,7 @@ export default {
       disabled: false,
       form: {
         description: "",
-        vatInput: 0,
+        vatInput: "",
         radioButton: null,
         bruttoPriceInput: null,
         nettoPriceInput: null,
@@ -122,13 +146,25 @@ export default {
         },
         vatInput: {
           required,
-            $autoDirty: true,
-            $lazy: true
+          $autoDirty: true,
+          $lazy: true,
+        },
+        nettoPriceInput: {
+          required,
+        },
+        radioButton: {
+          required,
         },
       },
     };
   },
   methods: {
+    async veeSubmitForm() {
+      const isFormCorrect = await this.v$.$validate();
+      // you can show some extra alert to the user or just leave the each field to show it's `$errors`.
+      if (!isFormCorrect) return;
+      // actually submit form
+    },
     submitForm() {
       this.$v.form.$touch();
       if (!this.$v.form.$invalid) {
@@ -220,8 +256,7 @@ label {
 }
 
 input,
-textarea,
-option {
+textarea {
   width: 250px;
   border: 2px solid #b9acac;
   border-radius: 4px;
@@ -233,9 +268,15 @@ option {
 textarea {
   text-align: left;
 }
-option {
-  text-align: left;
+select {
+  width: 275px;
+  border: 2px solid #b9acac;
+  border-radius: 4px;
+  display: block;
+  font-size: 14px;
+  padding: 10px;
 }
+
 button {
   border-radius: 6px;
   display: block;
@@ -252,9 +293,5 @@ p {
   display: flex;
   text-align: center;
   justify-content: center;
-}
-input:focus {
-  outline: 0;
-  border-color: #777;
 }
 </style>
