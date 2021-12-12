@@ -3,25 +3,23 @@
     <form @submit.prevent="veeSubmitForm">
       <h1>Calculating Form</h1>
       <div class="form-group">
-        <div class="radioButton">
-          <p>
-            {{ form.descriptionMaxLength - form.description.length }} /
-            {{ form.descriptionMaxLength }}
-          </p>
+        <p>
+          {{ form.descriptionMaxLength - form.description.length }} /
+          {{ form.descriptionMaxLength }}
+        </p>
+
+        <label for="Description">Description </label>
+
+        <textarea
+          v-model="form.description"
+          @blur="v$.form.description.$touch"
+          maxlength="255"
+        >
+        </textarea>
+        <div class="errors" v-if="v$.form.description.$error">
+          Text is required
         </div>
 
-        <label for="Description"
-          >Description
-          <textarea
-            v-model="form.description"
-            @blur="v$.form.description.$touch"
-            maxlength="255"
-          >
-          </textarea>
-          <div class="errors" v-if="v$.form.description.$error">
-            Text is required
-          </div>
-        </label>
         <p class="errors" v-if="!descriptionLengthValidation">
           You can’t enter more than 255 characters
         </p>
@@ -34,14 +32,13 @@
           :value="form.vatInput"
           v-model="form.vatInput"
           @blur="v$.form.vatInput.$touch"
-           name="myselect"
+          name="myselect"
         >
-          <option  value  disabled>Choose vat</option>
+          <option value disabled>Choose vat</option>
           <option
             v-for="option in options"
             :key="option.value"
             :value="option.value"
-          
           >
             {{ option.value + "%" }}
           </option>
@@ -65,7 +62,7 @@
       </div>
       <div class="form-group">
         <label for="Send confirmation">Send Confirmation</label>
-        <div class="displayFlex">
+        <div>
           <label for="yes"
             >Yes
             <input
@@ -75,8 +72,7 @@
               @blur="v$.form.vatInput.$touch"
             />
           </label>
-        </div>
-        <div class="displayFlex">
+
           <label for="no"
             >No
             <input
@@ -87,10 +83,11 @@
             />
           </label>
         </div>
-        <div class="errors" v-if="v$.form.radioButton.$error">
-          Text is required
-        </div>
       </div>
+      <div class="errors" v-if="v$.form.radioButton.$error">
+        Text is required
+      </div>
+
       <button type="submit">Submit</button>
     </form>
   </div>
@@ -229,7 +226,7 @@ h1 {
 }
 form {
   width: 400px;
-  height: auto;
+  height: 500px;
   margin: auto;
   padding: 20px 30px;
   display: grid;
@@ -240,33 +237,21 @@ form {
 .form-group {
   display: grid;
   margin-bottom: 10px;
-  padding-bottom: 20px;
   position: relative;
 }
 .radioButton {
   display: flex;
 }
 .errors {
+  display: block;
+    text-align: center;
   color: red;
+  font-weight: 700;
 }
 label {
   display: inline-block;
   font-size: 15px;
   font-weight: 800;
-}
-
-input,
-textarea {
-  width: 250px;
-  border: 2px solid #b9acac;
-  border-radius: 4px;
-  text-align: center;
-  display: block;
-  font-size: 14px;
-  padding: 10px;
-}
-textarea {
-  text-align: left;
 }
 select {
   width: 275px;
@@ -278,20 +263,17 @@ select {
 }
 
 button {
+	background-color:#8294b9;
+	border: 2px solid #8294b9;
   border-radius: 6px;
+  height: 50px;
   display: block;
   font-size: 20px;
-  padding: 10px;
   cursor: pointer;
   transition: 0.8s;
 }
 p {
   margin: auto;
   font-size: 15px;
-}
-.displayFlex {
-  display: flex;
-  text-align: center;
-  justify-content: center;
 }
 </style>
