@@ -4,16 +4,22 @@
       <h1>Calculating Form</h1>
       <div class="form-group">
         <div class="radioButton">
-          <label for="Description">Description</label>
           <p>
             {{ form.descriptionMaxLength - form.description.length }} /
             {{ form.descriptionMaxLength }}
           </p>
         </div>
 
-        <textarea v-model="form.description" maxlength="255"  > </textarea>
-
-        <p class="errors " v-if="!descriptionValidation">Text is required</p>
+        <label for="Description"
+          >Description
+          <textarea
+            v-model="form.description"
+            @blur="v$.form.description.$touch"
+            maxlength="255"
+          >
+          </textarea>
+          <div class="errors" v-if="v$.form.description.$error">Text is required</div>
+        </label>
         <p class="errors" v-if="!descriptionLengthValidation">
           You can’t enter more than 255 characters
         </p>
@@ -25,6 +31,7 @@
           @change="changeDisable"
           :value="form.vatInput"
           v-model="form.vatInput"
+              @blur="v$.form.vatInput.$touch"
         >
           <option :value="form.vatInput" disabled hidden>Choose vat</option>
           <option
@@ -35,7 +42,8 @@
             {{ option.value + "%" }}
           </option>
         </select>
-                <p class="errors" v-if="!chooseVatValidation">Text is required</p>
+              <div class="errors" v-if="v$.form.vatInput.$error">Text is required</div>
+        <p class="errors" v-if="!chooseVatValidation">Text is required</p>
         <label for="price Netto EUR">Price Netto EUR</label>
         <input
           type="number"
@@ -46,16 +54,15 @@
 
         <label for="price Brutto EUR">Price Brutto EUR</label>
         <input type="number" :value="calculateBrutto" disabled />
-        
       </div>
       <div class="form-group">
         <label for="Send confirmation">Send Confirmation</label>
         <div class="displayFlex">
-          <label for="yes" >Yes</label>
+          <label for="yes">Yes</label>
           <input type="radio" name="yesOrNo" v-model="form.radioButton" />
         </div>
         <div class="displayFlex">
-          <label for="no"  >No</label>
+          <label for="no">No</label>
           <input type="radio" name="yesOrNo" v-model="form.radioButton" />
         </div>
         <p v-if="!validateRadioButton" class="errors">Text is required</p>
@@ -66,8 +73,16 @@
 </template>
 
 <script>
+import useVuelidate from "@vuelidate/core";
+import { required } from "@vuelidate/validators";
+
 export default {
   name: "App",
+  setup() {
+    return {
+      v$: useVuelidate(),
+    };
+  },
   data() {
     return {
       options: [
@@ -95,12 +110,31 @@ export default {
       },
     };
   },
+  validations() {
+    return {
+      description2: {
+        required,
+      },
+      form: {
+        description: {
+          required,
+          $autoDirty: true,
+        },
+        vatInput: {
+          required,
+            $autoDirty: true,
+            $lazy: true
+        },
+      },
+    };
+  },
   methods: {
     submitForm() {
-      if (this.validateForm) {
-        return "good";
+      this.$v.form.$touch();
+      if (!this.$v.form.$invalid) {
+        console.log("📝 Form Submitted", this.form);
       } else {
-        return "wrong";
+        console.log("❌ Invalid form");
       }
     },
     changeDisable() {
@@ -127,17 +161,15 @@ export default {
         this.validateRadioButton
       );
     },
+
     validateRadioButton() {
-      return !!this.form.radioButton
+      return !!this.form.radioButton;
     },
     chooseVatValidation() {
-      return !!this.form.vatInput
+      return !!this.form.vatInput;
     },
     nettoPriceValidation() {
-      return !!this.form.nettoPriceInput
-    },
-    descriptionValidation() {
-      return !!this.form.description;
+      return !!this.form.nettoPriceInput;
     },
     descriptionLengthValidation() {
       return this.form.description.length < 255;
@@ -190,6 +222,7 @@ label {
 input,
 textarea,
 option {
+  width: 250px;
   border: 2px solid #b9acac;
   border-radius: 4px;
   text-align: center;
@@ -221,7 +254,7 @@ p {
   justify-content: center;
 }
 input:focus {
-	outline: 0;
-	border-color: #777;
+  outline: 0;
+  border-color: #777;
 }
 </style>
