@@ -145,7 +145,6 @@ export default {
         },
         vatInput: {
           required,
-
           $autoDirty: true,
           $lazy: true,
         },
