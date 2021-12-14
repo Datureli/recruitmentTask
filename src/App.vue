@@ -1,6 +1,6 @@
 <template>
-  <div class="formDiv">
-    <form @submit.prevent="veeSubmitForm">
+  <div>
+    <form v-if="!successStatus" @submit.prevent="veeSubmitForm">
       <h1>Calculating Form</h1>
       <div class="form-group">
         <p>
@@ -43,13 +43,17 @@
             {{ option.value + "%" }}
           </option>
         </select>
+
         <div class="errors" v-if="v$.form.vatInput.$error">
           Text is required
         </div>
         <label for="price Netto EUR">Price Netto EUR</label>
+        <p class="errors" v-if="!isNumber && form.nettoPriceInput.length > 0">
+          Please,input number
+        </p>
         <input
           type="number"
-          v-model="form.nettoPriceInput"
+          v-model.number="form.nettoPriceInput"
           :disabled="isDisabled"
           @blur="v$.form.vatInput.$touch"
         />
@@ -90,12 +94,13 @@
 
       <button type="submit">Submit</button>
     </form>
+    <div v-else>dsadsadsadas</div>
   </div>
 </template>
 
 <script>
 import useVuelidate from "@vuelidate/core";
-import { required } from "@vuelidate/validators";
+import { required, alphaNum } from "@vuelidate/validators";
 
 export default {
   name: "App",
@@ -121,21 +126,19 @@ export default {
         },
       ],
       disabled: false,
+      successStatus: false,
       form: {
         description: "",
         vatInput: "",
         radioButton: null,
         bruttoPriceInput: null,
-        nettoPriceInput: null,
+        nettoPriceInput: "",
         descriptionMaxLength: 255,
       },
     };
   },
   validations() {
     return {
-      description2: {
-        required,
-      },
       form: {
         description: {
           required,
@@ -143,11 +146,13 @@ export default {
         },
         vatInput: {
           required,
+
           $autoDirty: true,
           $lazy: true,
         },
         nettoPriceInput: {
           required,
+          alphaNum,
         },
         radioButton: {
           required,
@@ -157,24 +162,20 @@ export default {
   },
   methods: {
     async veeSubmitForm() {
+      
       const isFormCorrect = await this.v$.$validate();
-      // you can show some extra alert to the user or just leave the each field to show it's `$errors`.
-      if (!isFormCorrect) return;
-      // actually submit form
-    },
-    submitForm() {
-      this.$v.form.$touch();
-      if (!this.$v.form.$invalid) {
-        console.log("📝 Form Submitted", this.form);
-      } else {
-        console.log("❌ Invalid form");
-      }
-    },
+      if (!isFormCorrect)  {
+return 
+    }
+    else {
+      this.successStatus = true
+    }
+      } ,
     changeDisable() {
       this.disabled = true;
     },
-    radioButtonValidation() {
-      return !!this.form.radioButton;
+    showSuccessStatus() {
+      this.successStatus = true;
     },
   },
   computed: {
@@ -186,23 +187,13 @@ export default {
       return this.form.nettoPriceInput - calculateVat;
     },
     validateForm() {
-      return (
-        this.descriptionValidation &&
-        this.descriptionLengthValidation &&
-        this.nettoPriceValidation &&
-        this.chooseVatValidation &&
-        this.validateRadioButton
-      );
+      return this.descriptionLengthValidation && this.isNumber;
     },
-
-    validateRadioButton() {
-      return !!this.form.radioButton;
-    },
-    chooseVatValidation() {
-      return !!this.form.vatInput;
-    },
-    nettoPriceValidation() {
-      return !!this.form.nettoPriceInput;
+    isNumber() {
+      if (this.form.nettoPriceInput.length > 0) {
+        typeof this.form.nettoPriceInput === "number";
+      }
+      return this.form.nettoPriceInput;
     },
     descriptionLengthValidation() {
       return this.form.description.length < 255;
@@ -244,7 +235,7 @@ form {
 }
 .errors {
   display: block;
-    text-align: center;
+  text-align: center;
   color: red;
   font-weight: 700;
 }
@@ -261,10 +252,13 @@ select {
   font-size: 14px;
   padding: 10px;
 }
-
+textarea {
+  max-width: 275px;
+  max-height: 100px;
+}
 button {
-	background-color:#8294b9;
-	border: 2px solid #8294b9;
+  background-color: #8294b9;
+  border: 2px solid #8294b9;
   border-radius: 6px;
   height: 50px;
   display: block;
