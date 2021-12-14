@@ -94,7 +94,9 @@
 
       <button type="submit">Submit</button>
     </form>
-    <div v-else>dsadsadsadas</div>
+    <div class="successStatus" v-else>
+      <p class="successStatusParagraph">Congratulations!</p>
+    </div>
   </div>
 </template>
 
@@ -162,15 +164,13 @@ export default {
   },
   methods: {
     async veeSubmitForm() {
-      
       const isFormCorrect = await this.v$.$validate();
-      if (!isFormCorrect)  {
-return 
-    }
-    else {
-      this.successStatus = true
-    }
-      } ,
+      if (!isFormCorrect) {
+        return;
+      } else {
+        this.successStatus = true;
+      }
+    },
     changeDisable() {
       this.disabled = true;
     },
@@ -188,12 +188,6 @@ return
     },
     validateForm() {
       return this.descriptionLengthValidation && this.isNumber;
-    },
-    isNumber() {
-      if (this.form.nettoPriceInput.length > 0) {
-        typeof this.form.nettoPriceInput === "number";
-      }
-      return this.form.nettoPriceInput;
     },
     descriptionLengthValidation() {
       return this.form.description.length < 255;
@@ -269,5 +263,20 @@ button {
 p {
   margin: auto;
   font-size: 15px;
+}
+.successStatus {
+  display: grid;
+  width: 200px;
+  height: 200px;
+  color: rgb(255, 255, 255);
+  background: rgb(66, 156, 66);
+  border: 2px solid rgb(0, 128, 0);
+  text-align: center;
+  justify-content: center;
+  border-radius: 50%;
+  margin: 150px auto;
+}
+.successStatusParagraph {
+  font-size: 25px;
 }
 </style>
