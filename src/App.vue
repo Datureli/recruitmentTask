@@ -8,7 +8,7 @@
           {{ form.descriptionMaxLength }}
         </p>
 
-        <label for="Description">Description </label>
+        <label for="Description">Description</label>
 
         <textarea
           v-model="form.description"
@@ -48,9 +48,6 @@
           Text is required
         </div>
         <label for="price Netto EUR">Price Netto EUR</label>
-        <p class="errors" v-if="!isNumber && form.nettoPriceInput.length > 0">
-          Please,input number
-        </p>
         <input
           type="number"
           v-model.number="form.nettoPriceInput"
